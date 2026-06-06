@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Ticket</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="p-6">
+
+<h1 class="text-xl font-bold mb-4">Create Ticket</h1>
+
+<input id="name" placeholder="Name" class="border p-2 w-full mb-2">
+<input id="email" placeholder="Email" class="border p-2 w-full mb-2">
+<input id="subject" placeholder="Subject" class="border p-2 w-full mb-2">
+<textarea id="desc" placeholder="Description" class="border p-2 w-full mb-2"></textarea>
+
+<button onclick="createTicket()" class="bg-green-500 text-white px-4 py-2">
+  Submit
+</button>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+async function createTicket() {
+
+  let body = {
+    customer_name: document.getElementById("name").value,
+    customer_email: document.getElementById("email").value,
+    subject: document.getElementById("subject").value,
+    description: document.getElementById("desc").value
+  };
+
+  let res = await fetch(`${API}/api/tickets`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+
+  let data = await res.json();
+
+  console.log("Created:", data); // ✅ DEBUG
+
+  alert("Ticket Created: " + data.ticket_id);
+
+  // 🔥 IMPORTANT FIX
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ticket Detail</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+
+  <h1 class="text-2xl font-bold mb-4">🎫 Ticket Details</h1>
+
+  <div id="ticket"></div>
+
+  <hr class="my-4">
+
+  <h2 class="text-xl font-semibold mb-2">Update Ticket</h2>
+
+  <!-- STATUS -->
+  <select id="status" class="border p-2 w-full mb-2">
+    <option>Open</option>
+    <option>In Progress</option>
+    <option>Closed</option>
+  </select>
+
+  <!-- NOTES -->
+  <textarea id="notes"
+    class="border p-2 w-full mb-2"
+    placeholder="Add notes..."></textarea>
+
+  <button onclick="updateTicket()"
+    class="bg-blue-600 text-white px-4 py-2 rounded">
+    Update Ticket
+  </button>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+let currentTicket = null;
+
+// LOAD TICKET
+async function loadTicket() {
+  let res = await fetch(`${API}/api/tickets/${id}`);
+  let t = await res.json();
+
+  currentTicket = t;
+
+  document.getElementById("ticket").innerHTML = `
+    <p><b>ID:</b> ${t.ticket_id}</p>
+    <p><b>Name:</b> ${t.customer_name}</p>
+    <p><b>Email:</b> ${t.customer_email}</p>
+    <p><b>Subject:</b> ${t.subject}</p>
+    <p><b>Description:</b> ${t.description}</p>
+    <p><b>Status:</b> ${t.status}</p>
+  `;
+
+  document.getElementById("status").value = t.status;
+  document.getElementById("notes").value = t.notes || "";
+}
+// UPDATE TICKET
+async function updateTicket() {
+
+  let body = {
+    status: document.getElementById("status").value,
+    notes: document.getElementById("notes").value
+  };
+
+  let res = await fetch(`${API}/api/tickets/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+
+  let data = await res.json();
+
+  alert("Ticket Updated Successfully!");
+
+  window.location.href = "index.html";
+}
+
+loadTicket()
+;
+</script>
+
+</body>
+</html>

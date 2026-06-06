@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Support CRM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+tailwind.config = {
+  darkMode: 'class'
+}
+</script>
+</head>
+
+<body class="bg-gray-100 text-black dark:bg-gray-900 dark:text-white transition-all duration-300">
+
+<div class="max-w-6xl mx-auto p-6 text-gray-900 dark:text-white">
+
+  <!-- HEADER -->
+  <!-- HEADER -->
+<div class="flex justify-between items-center mb-6">
+
+  <div class="flex items-center gap-3">
+
+    <!-- LOGO -->
+    <div class="bg-blue-600 text-white w-12 h-12 rounded-xl
+                flex items-center justify-center text-2xl shadow-lg">
+      🎫
+    </div>
+
+    <!-- TITLE -->
+    <div>
+      <h1 class="text-3xl font-bold">
+        Support CRM
+      </h1>
+
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Customer Support Ticket Management
+      </p>
+    </div>
+
+  </div>
+
+  <!-- CLOCK -->
+  <div class="text-sm font-semibold" id="clock"></div>
+
+</div>
+  <!-- DARK MODE -->
+  <button onclick="toggleDark()"
+  class="mb-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow">
+  🌙 Toggle Dark Mode
+</button>
+
+  <!-- STATS -->
+  <div class="grid grid-cols-3 gap-4 mb-4">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+      Total: <span id="total">0</span>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+      Open: <span id="open">0</span>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+      Closed: <span id="closed">0</span>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="flex gap-2 mb-4">
+
+    <input id="search" class="border p-2 w-1/2 text-black"
+      placeholder="Search tickets">
+
+    <select id="status" class="border p-2 text-black">
+      <option value="">All</option>
+      <option>Open</option>
+      <option>In Progress</option>
+      <option>Closed</option>
+    </select>
+
+    <button onclick="loadTickets()"
+      class="bg-blue-600 text-white px-4 rounded">
+      Search
+    </button>
+
+    <a href="create.html"
+      class="bg-green-600 text-white px-4 py-2 rounded">
+      + Create
+    </a>
+
+  </div>
+
+  <!-- LOADER -->
+  <div id="loader" class="hidden mb-3 font-bold">
+    Loading...
+  </div>
+
+  <!-- TICKETS -->
+  <div id="tickets"></div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast"
+  class="hidden fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg">
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+
+// TOAST (FIXED - inside script)
+function showToast(message, color="green") {
+  const toast = document.getElementById("toast");
+
+  toast.innerText = message;
+
+  toast.className = `
+    fixed bottom-5 right-5 text-white px-4 py-2 rounded shadow-lg
+    ${color === "red" ? "bg-red-600" : "bg-green-600"}
+  `;
+
+  toast.classList.remove("hidden");
+
+  setTimeout(() => {
+    toast.classList.add("hidden");
+  }, 2000);
+}
+
+
+// DARK MODE
+function toggleDark() {
+  document.documentElement.classList.toggle("dark");
+}
+
+
+// CLOCK
+function updateClock() {
+  document.getElementById("clock").innerText =
+    new Date().toLocaleString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+
+// LOAD TICKETS (FIXED)
+async function loadTickets() {
+
+  document.getElementById("loader").classList.remove("hidden");
+
+  let search = document.getElementById("search").value;
+  let status = document.getElementById("status").value;
+
+  // ✅ build URL safely
+  let url = new URL(`${API}/api/tickets`);
+
+  if (search) {
+    url.searchParams.append("search", search);
+  }
+
+  if (status) {
+    url.searchParams.append("status", status);
+  }
+
+  try {
+    let res = await fetch(url);
+    let data = await res.json();
+
+    console.log("API DATA:", data); // ✅ DEBUG
+
+    render(data);
+    updateStats(data);
+
+  } catch (error) {
+    console.error("Error loading tickets:", error);
+    showToast("Failed to load tickets", "red");
+  }
+
+  document.getElementById("loader").classList.add("hidden");
+}
+
+// RENDER
+function render(data) {
+  let box = document.getElementById("tickets");
+  box.innerHTML = "";
+
+  data.forEach(t => {
+    box.innerHTML += `
+      <div class="bg-white dark:bg-gray-800 p-4 mb-3 rounded shadow">
+
+        <div class="flex justify-between">
+          <b>${t.ticket_id}</b>
+          <span>${t.status}</span>
+        </div>
+
+        <p class="font-semibold">${t.subject}</p>
+        <p class="text-sm">${t.customer_name}</p>
+
+        <div class="flex gap-3 mt-2">
+
+          <a class="text-blue-500"
+            href="ticket.html?id=${t.ticket_id}">
+            View
+          </a>
+
+          <button onclick="deleteTicket('${t.ticket_id}')"
+            class="text-red-500">
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  });
+}
+
+
+// DELETE
+async function deleteTicket(id) {
+
+  if (!confirm("Delete this ticket?")) return;
+
+  await fetch(`${API}/api/tickets/${id}`, {
+    method: "DELETE"
+  });
+
+  showToast("Ticket Deleted", "green");
+  loadTickets();
+}
+
+
+// STATS
+function updateStats(data) {
+  document.getElementById("total").innerText = data.length;
+  document.getElementById("open").innerText =
+    data.filter(t => t.status === "Open").length;
+  document.getElementById("closed").innerText =
+    data.filter(t => t.status === "Closed").length;
+}
+
+
+// INIT
+loadTickets();
+</script>
+<footer class="text-center text-sm text-gray-500 mt-10 mb-4">
+  Built by Ananya Musale • Support CRM System • 2026
+</footer>
+</body>
+</html>
