@@ -192,7 +192,14 @@ function render(data) {
         </div>
 
         <p class="font-semibold">${t.subject}</p>
-        <p class="text-sm">${t.customer_name}</p>
+
+<p class="text-sm">
+  ${t.customer_name}
+</p>
+
+<p class="text-xs text-gray-500">
+  ${new Date(t.created_at).toLocaleString()}
+</p>
 
         <div class="flex gap-3 mt-2">
 
