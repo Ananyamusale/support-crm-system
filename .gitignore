@@ -1,0 +1,11 @@
+# secrets and local data - never commit these
+.env
+*.db
+*.sqlite3
+*.log
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
