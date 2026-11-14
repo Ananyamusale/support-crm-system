@@ -1,94 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Ticket Detail</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Support CRM - Ticket</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
-<body class="bg-gray-100 p-6">
-
-<div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-
-  <h1 class="text-2xl font-bold mb-4">🎫 Ticket Details</h1>
-
-  <div id="ticket"></div>
-
-  <hr class="my-4">
-
-  <h2 class="text-xl font-semibold mb-2">Update Ticket</h2>
-
-  <!-- STATUS -->
-  <select id="status" class="border p-2 w-full mb-2">
-    <option>Open</option>
-    <option>In Progress</option>
-    <option>Closed</option>
-  </select>
-
-  <!-- NOTES -->
-  <textarea id="notes"
-    class="border p-2 w-full mb-2"
-    placeholder="Add notes..."></textarea>
-
-  <button onclick="updateTicket()"
-    class="bg-blue-600 text-white px-4 py-2 rounded">
-    Update Ticket
-  </button>
-
+<body>
+<div class="wrap">
+  <div id="header"></div>
+  <a class="link" href="index.html">← Back to tickets</a>
+  <div id="detail" class="mt12"></div>
 </div>
-
-<script>
-const API = "https://support-crm-system-1-qv98.onrender.com";
-
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-
-let currentTicket = null;
-
-// LOAD TICKET
-async function loadTicket() {
-  let res = await fetch(`${API}/api/tickets/${id}`);
-  let t = await res.json();
-
-  currentTicket = t;
-
-  document.getElementById("ticket").innerHTML = `
-    <p><b>ID:</b> ${t.ticket_id}</p>
-    <p><b>Name:</b> ${t.customer_name}</p>
-    <p><b>Email:</b> ${t.customer_email}</p>
-    <p><b>Subject:</b> ${t.subject}</p>
-    <p><b>Description:</b> ${t.description}</p>
-    <p><b>Status:</b> ${t.status}</p>
-  `;
-
-  document.getElementById("status").value = t.status;
-  document.getElementById("notes").value = t.notes || "";
-}
-// UPDATE TICKET
-async function updateTicket() {
-
-  let body = {
-    status: document.getElementById("status").value,
-    notes: document.getElementById("notes").value
-  };
-
-  let res = await fetch(`${API}/api/tickets/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-
-  let data = await res.json();
-
-  alert("Ticket Updated Successfully!");
-
-  window.location.href = "index.html";
-}
-
-loadTicket()
-;
-</script>
-
+<script src="common.js"></script>
+<script src="ticket.js"></script>
 </body>
 </html>

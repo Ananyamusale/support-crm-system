@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Support CRM - Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap narrow">
+  <div class="brand mb16">
+    <div class="logo">🎫</div>
+    <div><h1>Support CRM</h1><div class="muted">Please sign in</div></div>
+  </div>
+
+  <form id="loginForm" class="card" autocomplete="on">
+    <h2>Login</h2>
+    <label for="l_user">Username</label>
+    <input id="l_user" name="username" maxlength="50" required autocomplete="username">
+    <label for="l_pass">Password</label>
+    <input id="l_pass" name="password" type="password" maxlength="128" required autocomplete="current-password">
+    <div id="l_err" class="err"></div>
+    <button class="btn" type="submit">Sign in</button>
+    <p class="muted">No account? <a href="#" id="showReg" class="link">Register as a customer</a></p>
+  </form>
+
+  <form id="regForm" class="card hidden" autocomplete="off">
+    <h2>Register</h2>
+    <label for="r_user">Username</label>
+    <input id="r_user" maxlength="50" minlength="3" required pattern="[A-Za-z0-9_.\-]+">
+    <label for="r_name">Full name</label>
+    <input id="r_name" maxlength="100" required>
+    <label for="r_email">Email</label>
+    <input id="r_email" type="email" maxlength="254" required>
+    <label for="r_pass">Password (min 10 characters, letters and digits)</label>
+    <input id="r_pass" type="password" minlength="10" maxlength="128" required autocomplete="new-password">
+    <div id="r_err" class="err"></div>
+    <button class="btn green" type="submit">Create account</button>
+    <p class="muted">Already registered? <a href="#" id="showLogin" class="link">Back to login</a></p>
+  </form>
+</div>
+<script src="common.js"></script>
+<script src="login.js"></script>
+</body>
+</html>
